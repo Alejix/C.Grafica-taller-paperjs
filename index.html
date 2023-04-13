@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Taller 2D Paperjs</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/paper.js/0.12.2/paper-full.min.js"></script>
+  <script src="https://unpkg.com/paper"></script>
+  <script type="text/javascript" src="js/paper.js"></script>
+</head>
+
+<body style="background-image: url('img/bg.jpg');">
+  <canvas id="canvas" resize></canvas>
+  <script>
+    paper.install(window);
+    // Inicializa Paper.js en el canvas
+    
+    paper.setup('canvas');
+    paper.view.viewSize = new paper.Size(1000, 500);
+    paper.view.center = paper.view.viewSize / 2;
+
+
+    // Crea un rectángulo rojo en el canvas
+    var base = new Path.RegularPolygon(new Point(80, 70), 3, 50);
+    base.style = {
+        fillColor: 'black',
+        strokeColor: 'white',
+        strokeWidth: 3
+    };
+
+    propulsor =  new Path.RegularPolygon(new Point(60, 105), 3, 15);
+    propulsor.style = {
+        fillColor: '#808080',
+        strokeColor: 'white',
+        strokeWidth: 3
+    }
+    base.addChild(propulsor);
+
+    propulsor1 =  new Path.RegularPolygon(new Point(100, 105), 3, 15);
+    propulsor1.style = {
+        fillColor: '#808080',
+        strokeColor: 'white',
+        strokeWidth: 3
+    }
+    base.addChild(propulsor1);
+
+    cabina = new Path.Rectangle(new Point(65, 55), new Size(30, 30));
+    cabina.style = {
+        fillColor: '#808080',
+        strokeColor: 'white'
+    };
+    base.addChild(cabina);
+
+    ventana = new Path.Circle(new Point (80,70), 10);
+    ventana.style = {
+        fillColor: 'blue',
+        strokeColor: 'white'
+    }
+    cabina.addChild(ventana);
+
+    var nave = new paper.Group([base, propulsor, propulsor1, cabina, ventana]);
+    propulsor.sendToBack();
+    propulsor1.sendToBack();
+
+    var circulo = new Path.Circle({
+      center: nave.position.add([0,30]),
+      radius: 10,
+      fillColor: 'yellow'
+    });
+    nave.addChild(circulo);
+
+    // Define la velocidad de rotación del círculo
+    var velocidad = 3;
+
+    // Manejador de eventos onFrame
+    function onFrame(event) {
+    // Calcula la posición del centro del círculo alrededor de la nave
+        var posicion = new Point({
+            length: 40,
+            angle: event.count * velocidad
+        });
+        circulo.position = nave.position.add(posicion);
+    }
+
+    // Movimientos del rectangulo
+    function onKeyDown(event) {
+      if (event.key == 'w') {
+            nave.position.y -= 10;
+        }
+
+      if (event.key == 'a') {
+        nave.position.x -= 10;
+      }
+      if (event.key == 's') {
+        nave.position.y += 10;
+      }
+      if (event.key == 'd') {
+        nave.position.x += 10;
+      }
+
+    //   El rectangulo rota
+      if (event.key == 'z') {
+        nave.rotate(-5);
+    }
+
+      if (event.key == 'x') {
+        nave.rotate(5);
+      }
+    }
+    
+    // Agrega un manejador de eventos de teclado al documento
+    function onDomLoad() {
+      document.addEventListener('keydown', onKeyDown);
+      
+      //Agrandar la nave con el mouse
+      var cont=0;
+      canvas.onmousedown = function(event) {
+        if (cont==0){
+          nave.scale(2);
+          cont+=1;
+        }else{
+          nave.scale(.5);
+          cont-=1;
+        }
+      };
+    }
+    onDomLoad();
+    view.onFrame = onFrame;
+  </script>
+</body>
+
+<style>
+  #canvas {
+      border: 2px solid white;
+  }
+</style>
+
